@@ -2,4 +2,5 @@ langchain
 python-dotenv
 langchain_groq
 structlog
+langchain_google_genai
 -e .
