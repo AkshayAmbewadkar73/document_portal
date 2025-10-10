@@ -24,24 +24,58 @@ class DocumentHandler:
             self.log.error("Error initializing DocumentHandler", error=str(e))
             raise DocumentPortalException("Failed to initialize DocumentHandler", e) from e
 
-    def save_pdf(self):
+    def save_pdf(self,uploaded_file):
         try:
-            pass
+            filename=os.path.basename(uploaded_file.name)
+            if not filename.lower().endswith("pdf"):
+                raise DocumentPortalException("Uploaded file is not a PDF")
+            save_path=os.path.join(self.session_path,filename)
+            with open(save_path,'wb') as f:
+                f.write(uploaded_file.getbuffer())
+            self.log.info("PDF saved successfully", file=filename,save_path=save_path,session_id=self.session_id)  
+            return save_path  
         except Exception as e:
             self.log.error("Error saving PDF", error=str(e))
             raise DocumentPortalException("Failed to save PDF", e) from e
         
 
-    def read_pdf(self):
+    def read_pdf(self,pdf_path:str)->str:
         try:
-            pass
+            text_chunks=[]
+            with fitz.open(pdf_path)as doc:
+                for page_num,page in enumerate(doc,start=1):
+                    text_chunks.append(f"\n--- Page {page_num} ---\n{page.get_text()}")
+            text="\n".join(text_chunks)
+            self.log.info("PDF read successfully",pdf_path=pdf_path,session_id=self.session_id)
+            return text      
         except Exception as e:
             self.log.error("Error reading PDF", error=str(e))
             raise DocumentPortalException("Failed to read PDF", e) from e
         
 if __name__=='__main__':
-    handler=DocumentHandler()
-    print(f"Session Path: {handler.session_path}")        
+    from pathlib import Path
+    from io import BytesIO
+    
+    pdf_path=r"C:\\document_portal\\data\document_analysis\\Attention_All_you_need.pdf"
+    #print(f"Session Path: {handler.session_path}") 
+    class DummayFile:
+        def __init__(self,file_path):
+            self.name=Path(file_path).name
+            self._file_path=file_path
+        def getbuffer(self):
+            return open(self._file_path,'rb').read()
+    dummy_pdf=DummayFile(pdf_path) 
+    handler=DocumentHandler(session_id="test_session_001")
+    try:
+        saved_path=handler.save_pdf(dummy_pdf)
+        content=handler.read_pdf(saved_path)
+        print("PDF Content Preview:")
+        print(content[:500])
+        print(saved_path)
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
+              
 
         
 
