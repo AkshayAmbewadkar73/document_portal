@@ -56,7 +56,7 @@ if __name__=='__main__':
     from pathlib import Path
     from io import BytesIO
     
-    pdf_path=r"C:\\document_portal\\data\document_analysis\\Attention_All_you_need.pdf"
+    pdf_path=r"C:\\document_portal\data\\document_analysis\\sample.pdf"
     #print(f"Session Path: {handler.session_path}") 
     class DummayFile:
         def __init__(self,file_path):
@@ -65,7 +65,7 @@ if __name__=='__main__':
         def getbuffer(self):
             return open(self._file_path,'rb').read()
     dummy_pdf=DummayFile(pdf_path) 
-    handler=DocumentHandler(session_id="test_session_001")
+    handler=DocumentHandler()
     try:
         saved_path=handler.save_pdf(dummy_pdf)
         content=handler.read_pdf(saved_path)

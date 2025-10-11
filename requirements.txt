@@ -5,4 +5,6 @@ structlog
 langchain_google_genai
 langchain_core
 PyMuPDF
+structlog
+
 -e .
