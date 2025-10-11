@@ -3,34 +3,39 @@ from utils.model_loader import ModelLoader
 from logger.custom_logger import CustomLogger
 from exception.custom_exception import DocumentPortalException
 from prompt.prompt_library import *
+from prompt.prompt_library import PROMPT_REGISTRY
 import sys
-from model import *
-from langchain_core.output_parsers import JSONOutputParser
-from langchain.ouput_parsers import OutputFixingParser
-
+from model.models import *
+#from model import Metadata
+from langchain_core.output_parsers.json import JsonOutputParser
+from langchain.output_parsers import OutputFixingParser
 class DocumentAnalyzer:
     'Analyzes documents using a pre-trained model.'
     
     def __init__(self):
-        self.log=CustomLogger().get_logger(__name__)
+        self.log = CustomLogger().get_logger(__name__)
         try:
-            self.loader=ModelLoader()
-            self.llm=self.loader.load_llm()
-            #prepare parser
-            self.parser=JSONOutputParser(pydentic_object=Metadata)
-            self.fixing_parser=OutputFixingParser
-            self.prompt= prompt
+            self.loader = ModelLoader()
+            self.llm = self.loader.load_llm()
+
+            # Prepare parsers
+            self.parser = JsonOutputParser(pydantic_object=Metadata)
+            self.fixing_parser = OutputFixingParser.from_llm(parser=self.parser, llm=self.llm)
+
+            # Load prompt
+            self.prompt = PROMPT_REGISTRY["document_analysis"]
+
             self.log.info("DocumentAnalyzer initialized successfully")
-            
+
         except Exception as e:
-            self.log.error("Error initializing DocumentAnalyzer", error=str(e))
+            self.log.error(f"Error initializing DocumentAnalyzer: {e}")
             raise DocumentPortalException("Failed to initialize DocumentAnalyzer", e) from e
         
 
     def analyze_document(self, document_text:str)-> dict:
         """Analyze the document text and return structured metadata and summary"""
         try:
-            chain=self.prompt|self.LLM|self.parser
+            chain=self.prompt|self.llm|self.parser
             self.log.info("Meta data analysis chain initialized")
 
             response = chain.invoke({
@@ -41,6 +46,5 @@ class DocumentAnalyzer:
 
             return response
         except Exception as e:
-            self.log.error("Metadata analysis failed"),error=str(e)
-            raise DocumentPortalException("Failed to analyze document", e) from e
-        
+            self.log.error("Metadata analysis failed", error=str(e))
+            raise DocumentPortalException("Metadata extraction failed",sys)

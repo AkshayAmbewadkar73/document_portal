@@ -1,15 +1,14 @@
-from pydentic import BaseModel, Field
-from typing import Optional, List,Dict, Any
+from pydantic import BaseModel, Field
+from typing import Optional, List, Dict, Any, Union
 
 
 class Metadata(BaseModel):
-    Summary:List[str]=Field(default_factory=list, description="Summary of the document")
-    Title:str
-    Author:str
-    DateCreated:str
-    LastModifiedDate:str
-    Pubslisher:str
-    Langauge:str
-    PageCount:Union[int,str]
-    SentimentTone:str
-    
+    summary: List[str] = Field(default_factory=list, description="Summary of the document")
+    title: Optional[str] = None
+    author: Optional[str] = None
+    date_created: Optional[str] = None
+    last_modified_date: Optional[str] = None
+    publisher: Optional[str] = None
+    language: Optional[str] = None
+    page_count: Optional[Union[int, str]] = None
+    sentiment_tone: Optional[str] = None
