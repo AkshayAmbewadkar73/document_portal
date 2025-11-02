@@ -20,21 +20,25 @@ class DocumentComparatorLLM:
         self.prompt=PROMPT_REGISTRY["document_comparison"]
         self.chain=self.prompt|self.llm|self.fixing_parser
         self.log.info("DocumentComparatorLLM initialized successfully")
-    def compare_documents(self):
-        """
-        Compare two documents and returns a structured comparison.
-        """
+
+    def compare_documents(self, combined_docs: str) -> pd.DataFrame:
         try:
-            pass
+            inputs = {
+                "combined_docs": combined_docs,
+                "format_instruction": self.parser.get_format_instructions()
+            }
+
+            self.log.info("Invoking document comparison LLM chain")
+            response = self.chain.invoke(inputs)
+            self.log.info("Chain invoked successfully", response_preview=str(response)[:200])
+            return self._format_response(response)
         except Exception as e:
-            self.log.error("Error in compare_documents:{e}", error=str(e))
-            raise DocumentPortalException("An error occured while comparing document", sys) from e
-    def _format_response(self):
-        """
-        Format the LLM response into a structured format.
-        """
+            self.log.error("Error in compare_documents", error=str(e))
+            raise DocumentPortalException("Error comparing documents", sys)
+    def _format_response(self, response_parsed: list[dict]) -> pd.DataFrame: #type: ignore
         try:
-            pass
+            df = pd.DataFrame(response_parsed)
+            return df
         except Exception as e:
-            self.log.error("Error formatting response into Dataframe", error=str(e))
-            raise DocumentPortalException("Error formatting response", sys) from e
+            self.log.error("Error formatting response into DataFrame", error=str(e))
+            DocumentPortalException("Error formatting response", sys)

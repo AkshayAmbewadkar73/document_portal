@@ -7,7 +7,7 @@ from exception.custom_exception import DocumentPortalException
 class DocumentIngestion:
     
     def  __init__(self,base_dir):
-        self.log=CustomeLogger().get_logger(__name__)
+        self.log=CustomLogger().get_logger(__name__)
         self.base_dir=Path(base_dir)
         self.base_dir.mkdir(parents=True,exist_ok=True)
 
@@ -16,17 +16,34 @@ class DocumentIngestion:
         Delete existing files at specified paths.
         """
         try:
-            pass
+            if self.base_dir.exists() and self.base_dir.is_dir():
+                for file in self.base_dir.iterdir():
+                    if file.is_file():
+                        file.unlink()
+                        self.log.info("File deleted",path=str(file))
+                self.log.info("Directoru cleaned",ditectory=str(self.base_dir))        
         except Exception as e:
             self.log.error(f"Error deleting existing files:{e}")
             raise DocumentPortalException("An error occured while deleting existing files",sys)
 
-    def save_uploadded_file(self):
+    def save_uploadded_file(self,reference_file,actual_file):
         """
         Save the uploaded file to the specified directory.
         """
         try:
-            pass
+            self.delete_existing_files()
+            self.log.info('Existing files deleted successfully')
+            ref_path=self.base_dir/reference_file.name
+            ref_path=self.base_dir/actual_file.name
+            act_path=self.base_dir/actual_file.name
+            if not reference_file.endswith(".pdf") or not actual_file.endswith(".pdf"):
+                raise ValueError("Only PDF files are supported")
+            with open(ref_path,"wb") as f:
+                f.write(reference_file.getbuffer())
+            with open(act_path,"wb") as f:
+                f.write(actual_file.getbuffer())
+            self.log.info("Files saved",reference=str(ref_path),actual=str(act_path))
+            return ref_path,act_path        
         except Exception as e:
             self.log.error(f"Error saving uploaded file:{e}")
             raise DocumentPortalException("An error occured while saving the uploaded file",sys)
