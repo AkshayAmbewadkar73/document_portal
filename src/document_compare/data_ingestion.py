@@ -31,12 +31,13 @@ class DocumentIngestion:
         Save the uploaded file to the specified directory.
         """
         try:
-            self.delete_existing_files()
+            self.delete_existing_files(self.base_dir)
             self.log.info('Existing files deleted successfully')
             ref_path=self.base_dir/reference_file.name
             ref_path=self.base_dir/actual_file.name
             act_path=self.base_dir/actual_file.name
-            if not reference_file.endswith(".pdf") or not actual_file.endswith(".pdf"):
+            #if not reference_file.endswith(".pdf") or not actual_file.endswith(".pdf"):
+            if not reference_file.name.endswith(".pdf") or not actual_file.name.endswith(".pdf"):    
                 raise ValueError("Only PDF files are supported")
             with open(ref_path,"wb") as f:
                 f.write(reference_file.getbuffer())

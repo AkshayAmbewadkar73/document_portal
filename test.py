@@ -55,8 +55,8 @@ from src.document_compare.document_comparator import DocumentComparatorLLM
 def load_fake_uploaded_file(file_path:Path):
     return io.BytesIO(file_path.read_bytes())
 def test_compare_documnets():
-    ref_path=Path("C:\document_portal\data\document_compare\Long_Report_V1.pdf")
-    act_path=Path("C:\document_portal\data\document_compare\Long_Report_V2.pdf")
+    ref_path=Path("C:\\document_portal\\data\document_compare\\Long_Report_V1.pdf")
+    act_path=Path("C:\\document_portal\\data\document_compare\\Long_Report_V2.pdf")
 
     class FakeUpload:
         def __init__(self,file_path:Path):
@@ -69,7 +69,7 @@ def test_compare_documnets():
     ref_upload=FakeUpload(ref_path)
     act_upload=FakeUpload(act_path)
 
-    ref_file,act_file=comparator.save_uploaded_files(ref_upload,act_upload)
+    ref_file,act_file=comparator.save_uploadded_file(ref_upload,act_upload)
     combined_text=comparator.combine_documents()
     print("\n Combined Text priew(First 1000 characters):\n")
     print(combined_text[:1000])
@@ -79,4 +79,7 @@ def test_compare_documnets():
     print("\n===COMPARISON RESULT DATAFRAME===\n")
     print(comparison_df.head())
 if __name__=="__main__":
-    test_compare_documnets()    
+    test_compare_documnets()
+
+
+
