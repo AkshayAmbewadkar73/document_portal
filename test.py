@@ -69,8 +69,9 @@ def test_compare_documnets():
     ref_upload=FakeUpload(ref_path)
     act_upload=FakeUpload(act_path)
 
-    ref_file,act_file=comparator.save_uploadded_file(ref_upload,act_upload)
+    ref_file,act_file=comparator.save_uploaded_files(ref_upload,act_upload)
     combined_text=comparator.combine_documents()
+    comparator.clean_old_session(keep_latest=3)
     print("\n Combined Text priew(First 1000 characters):\n")
     print(combined_text[:1000])
 
